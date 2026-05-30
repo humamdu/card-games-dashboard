@@ -14,7 +14,7 @@
 
 ## Tarneeb 41
 
-- Team bidding game.
+- Player bidding game.
 - Winning target is 41 points.
 - Bid team scores tricks on success or negative bid on failure.
 - If the bidding team's pre-round score is under 30, bid-team success/failure delta is multiplied by 2.
