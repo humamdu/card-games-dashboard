@@ -13,7 +13,10 @@ class TrexEngine extends AbstractGameEngine
         'queens' => -25,
         'diamonds' => -10,
         'collections' => -15,
-        'trex' => 200,
+        'trex-1' => 200,
+        'trex-2' => 150,
+        'trex-3' => 100,
+        'trex-4' => 50,
     ];
 
     public function calculateRoundResults(MatchGame $match, Round $round, array $input): array
