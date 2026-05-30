@@ -15,8 +15,7 @@ System to manage card games results:
 - Game engines per rule set
 
 ## Stack
-- Laravel 11 API
-- Vue 3 + Vite
+- Laravel 11 + blade
 - MySQL
 - TailwindCSS
 
