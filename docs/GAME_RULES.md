@@ -35,9 +35,10 @@
 ## Kanasah
 
 - Team card scoring game.
-- Clean kanasta bonus: 500.
-- Dirty kanasta bonus: 300.
-- Trisa bonus: 100.
+- jokers kanasta bonus: 500.
+- Clean kanasta bonus: 300.
+- Dirty kanasta bonus: 200.
+- Trisa bonus: 200.
 - Joker value: 50 each, capped at 100 when 2 or more jokers are present.
 - Penalties subtract from the round delta.
 - Ends at configurable target score, default 5500; first/highest team at or over the target wins.
