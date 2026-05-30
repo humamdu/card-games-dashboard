@@ -1,26 +1,44 @@
 # Game Rules
 
 ## Trex
-- 4 players
-- 4 kingdoms
-- 20 rounds total
-- scoring per action
+
+- Requires exactly 4 single-player teams.
+- Uses 4 kingdoms and 20 total rounds.
+- Contract score mapping:
+  - King of hearts: -75 per captured king marker.
+  - Queens: -25 per queen.
+  - Diamonds: -10 per diamond.
+  - Collections: -15 per collection marker.
+  - Trex: positive placement score supplied by the client.
+- Winner is the highest score after 20 rounds.
 
 ## Tarneeb 41
-- 41 win condition
-- bidding system
-- team play
+
+- Player bidding game.
+- Winning target is 41 points.
+- Bid player scores tricks on success or negative bid on failure.
+- If the bidding team's pre-round score is under 30, bid-team success/failure delta is multiplied by 2.
 
 ## Tarneeb 61
-- win at 61
-- bid system
-- team scoring
+
+- Team bidding game.
+- Winning target is 61 points.
+- Bid team must reach bid amount; otherwise it loses the bid value.
+- Non-bid team scores collected tricks.
 
 ## Konkan
-- team points
-- lose at 550
 
-## Kanastah
-- cards scoring
-- kanasta + trisa + joker rules
-- win at 5500 or highest wins
+- Team score accumulation game.
+- Reaching 550 is losing condition.
+- When any team reaches 550 or more, the lowest-score team is declared winner.
+
+## Kanasah
+
+- Team card scoring game.
+- jokers kanasta bonus: 500.
+- Clean kanasta bonus: 300.
+- Dirty kanasta bonus: 200.
+- Trisa bonus: 200.
+- Joker value: 50 each, capped at 100 when 2 or more jokers are present.
+- Penalties subtract from the round delta.
+- Ends at configurable target score, default 5500; first/highest team at or over the target wins.
