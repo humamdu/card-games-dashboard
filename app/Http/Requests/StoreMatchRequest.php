@@ -21,7 +21,8 @@ class StoreMatchRequest extends FormRequest
             'teams' => ['required', 'array', 'min:2'],
             'teams.*.name' => ['required', 'string', 'max:255'],
             'teams.*.position' => ['nullable', 'integer', 'min:1'],
-            'teams.*.player_ids' => ['required', 'array', 'min:1'],
+            'teams.*.active' => ['nullable', 'string'],
+            'teams.*.player_ids' => ['nullable', 'array', 'min:1'],
             'teams.*.player_ids.*' => ['exists:players,id'],
         ];
     }

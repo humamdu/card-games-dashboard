@@ -1,5 +1,5 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="card">Use the navigation to manage matches and players.</div>
+    <div class="card">{{ __('ui.use_navigation') }}</div>
 @endsection

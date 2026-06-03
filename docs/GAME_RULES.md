@@ -2,7 +2,7 @@
 
 ## Trex
 
-- Requires exactly 4 single-player teams.
+- Requires exactly 2 teams each with 2 player.
 - Uses 4 kingdoms and 20 total rounds.
 - Contract score mapping:
   - King of hearts: -75 per captured king marker.
@@ -13,11 +13,12 @@
 - Winner is the highest score after 20 rounds.
 
 ## Tarneeb 41
-
+- Requires exactly 4 single-player teams.
 - Player bidding game.
 - Winning target is 41 points.
-- Bid player scores tricks on success or negative bid on failure.
-- If the bidding team's pre-round score is under 30, bid-team success/failure delta is multiplied by 2.
+- Bid player scores tricks on success or negative bid on failure for eache player.
+- If the bidding player's pre-round score is under 30, bid-player success/failure delta is multiplied by 2.
+- Ends at configurable target score, default 41 and second player in the team result >= 0; first/highest team at or over the target wins.
 
 ## Tarneeb 61
 

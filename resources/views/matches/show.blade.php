@@ -1,40 +1,44 @@
 @extends('layouts.app')
 
-@section('title', 'Match #'.$match->id.' | Card Games Dashboard')
+@section('title', __('ui.match').' #'.$match->id.' | '.__('ui.site_name'))
 
 @section('content')
 <section class="stack">
     <div class="card stack">
         <div class="row" style="justify-content: space-between">
-            <div>
-                <span class="badge">{{ $match->game_type->value }}</span>
-                <h1>Match #{{ $match->id }}</h1>
-                <p class="muted">Status: {{ $match->status }} @if($match->winnerTeam) • Winner: {{ $match->winnerTeam->name }} @endif</p>
+            <div style="display: grid;grid-auto-flow: column;gap: 2rem; align-items: baseline;">
+                <span class="badge">{{ __('ui.game_types.' . $match->game_type->value) }}</span>
+                <h3>{{ __('ui.match') }} #{{ $match->id }}</h3>
+                <p class="muted">{{ __('ui.status') }}: {{ $match->status }} @if($match->winnerTeam) • {{ __('ui.winner') }}: {{ $match->winnerTeam->name }} @endif</p>
             </div>
-            <a class="button secondary" href="{{ route('matches.index') }}">All matches</a>
+            <a class="button secondary" href="{{ route('matches.index') }}">{{ __('ui.matches') }}</a>
+        </div>
+
+        <div class="grid">
+            @foreach ($match->teams as $team)
+                <div class="card">
+                    <div class="grid" style="grid-auto-flow: column;align-items: baseline;">
+                        <h2>{{ $team->name }}</h2>
+                        <strong>{{ $team->score }} Pts</strong>
+                    </div>
+                    <p class="muted">{{ $team->players->pluck('name')->join(', ') }}</p>
+                </div>
+            @endforeach
         </div>
     </div>
 
-    <div class="grid">
-        @foreach ($match->teams as $team)
-            <div class="card">
-                <h2>{{ $team->name }}</h2>
-                <strong>{{ $team->score }} pts</strong>
-                <p class="muted">{{ $team->players->pluck('name')->join(', ') }}</p>
-            </div>
-        @endforeach
-    </div>
 
     @if ($match->status !== 'finished')
         <form class="card stack" method="POST" action="{{ route('matches.rounds.store', $match) }}">
             @csrf
-            <h2>Score next round</h2>
+            <h2>{{ __('ui.score_next_round') }}</h2>
             <div class="grid">
-                <label>Round number <input type="number" name="number" value="{{ old('number', $match->rounds->count() + 1) }}" min="1"></label>
-                <label>Kingdom <input name="kingdom" value="{{ old('kingdom') }}" placeholder="Trex kingdom"></label>
-                <label>Contract
+                <label style="display: none;">{{ __('ui.round') }} <input type="number" name="number" value="{{ old('number', $match->rounds->count() + 1) }}" min="1"></label>
+                @if ($match->game_type->value === 'trex')
+                <label>{{ __('ui.kingdom') }} <input name="kingdom" value="{{ old('kingdom') }}" placeholder="{{ __('ui.kingdom') }}"></label>
+                <label>{{ __('ui.contract_label') }}
                     <select name="contract">
-                        <option value="">Manual / not applicable</option>
+                        <option value="">{{ __('ui.manual_not_applicable') }}</option>
                         <option value="king_of_hearts">Trex: King of Hearts</option>
                         <option value="queens">Trex: Queens</option>
                         <option value="diamonds">Trex: Diamonds</option>
@@ -42,75 +46,123 @@
                         <option value="trex">Trex: Trex</option>
                     </select>
                 </label>
-                <label>Bid team
+                @endif
+                @if ($match->game_type->value === 'tarneeb_61')
+                <label>{{ __('ui.bid_team') }}
                     <select name="bid_team_id">
-                        <option value="">No bid</option>
+                        <option value="">{{ __('ui.no_bid') }}</option>
                         @foreach ($match->teams as $team)
                             <option value="{{ $team->id }}">{{ $team->name }}</option>
                         @endforeach
                     </select>
                 </label>
-                <label>Bid amount <input type="number" name="bid_amount" value="{{ old('bid_amount') }}"></label>
+                <label>{{ __('ui.bid_amount') }} <input type="number" name="bid_amount" value="{{ old('bid_amount') }}"></label>
+                @endif
             </div>
 
-            <h3>Trex / Konkan score input</h3>
-            <p class="muted">For Trex penalty contracts, enter captured item counts. For Trex contract, enter placement score. For Konkan, enter the round score added to each team.</p>
+            @if ($match->game_type->value === 'konkan' || $match->game_type->value === 'trex') 
+            <h3>{{ __('ui.score_input') }}</h3>
             <div class="grid">
                 @foreach ($match->teams as $team)
-                    <label>{{ $team->name }} score/count
+                    <label>{{ $team->name }} {{ __('ui.score_count') }}
                         <input type="number" name="payload[scores][{{ $team->id }}]" value="{{ old('payload.scores.'.$team->id, 0) }}">
                     </label>
                 @endforeach
             </div>
+            @endif
 
-            <h3>Tarneeb tricks input</h3>
-            <div class="grid">
-                @foreach ($match->teams as $team)
-                    <label>{{ $team->name }} tricks
-                        <input type="number" name="payload[tricks][{{ $team->id }}]" value="{{ old('payload.tricks.'.$team->id, 0) }}">
-                    </label>
-                @endforeach
-            </div>
-
-            <h3>Kanasah card scoring input</h3>
+            @if ($match->game_type->value === 'tarneeb_41')
+            <h3>{{ __('ui.player_bids') }}</h3>
             <div class="grid">
                 @foreach ($match->teams as $team)
                     <div class="team-form stack">
                         <strong>{{ $team->name }}</strong>
-                        <label>Card points <input type="number" name="payload[teams][{{ $team->id }}][card_points]" value="{{ old('payload.teams.'.$team->id.'.card_points', 0) }}"></label>
-                        <label>Clean kanasta count <input type="number" name="payload[teams][{{ $team->id }}][kanasta]" value="{{ old('payload.teams.'.$team->id.'.kanasta', 0) }}"></label>
-                        <label>Dirty kanasta count <input type="number" name="payload[teams][{{ $team->id }}][dirty_kanasta]" value="{{ old('payload.teams.'.$team->id.'.dirty_kanasta', 0) }}"></label>
-                        <label>Trisa count <input type="number" name="payload[teams][{{ $team->id }}][trisa]" value="{{ old('payload.teams.'.$team->id.'.trisa', 0) }}"></label>
-                        <label>Jokers <input type="number" name="payload[teams][{{ $team->id }}][jokers]" value="{{ old('payload.teams.'.$team->id.'.jokers', 0) }}"></label>
-                        <label>Penalties <input type="number" name="payload[teams][{{ $team->id }}][penalties]" value="{{ old('payload.teams.'.$team->id.'.penalties', 0) }}"></label>
+                        @foreach ($team->players as $player)
+                            <label>{{ $player->name }} {{ __('ui.bid') }}
+                                <input type="number" name="payload[bids][{{ $player->id }}]" value="{{ old('payload.bids.'.$player->id, 0) }}" required>
+                            </label>
+                            <label>{{ $player->name }} {{ __('ui.tricks') }}
+                                <input type="number" name="payload[tricks][{{ $player->id }}]" value="{{ old('payload.tricks.'.$player->id, 0) }}" required>
+                            </label>
+                        @endforeach
                     </div>
                 @endforeach
             </div>
+            @endif
 
-            <button>Save scored round</button>
+            @if ($match->game_type->value === 'kanasah')
+            <h3>{{ __('ui.score_input') }}</h3>
+            <div class="grid">
+                @foreach ($match->teams as $team)
+                    <div class="team-form stack">
+                        <strong>{{ $team->name }}</strong>
+                        <label>{{ __('ui.joker_kanasta') }} <input type="number" name="payload[teams][{{ $team->id }}][joker_kanasta]" value="{{ old('payload.teams.'.$team->id.'.joker_kanasta', 0) }}"></label>
+                        <label>{{ __('ui.clean_kanasta') }} <input type="number" name="payload[teams][{{ $team->id }}][kanasta]" value="{{ old('payload.teams.'.$team->id.'.kanasta', 0) }}"></label>
+                        <label>{{ __('ui.dirty_kanasta') }} <input type="number" name="payload[teams][{{ $team->id }}][dirty_kanasta]" value="{{ old('payload.teams.'.$team->id.'.dirty_kanasta', 0) }}"></label>
+                        <label>{{ __('ui.trisa') }} <input type="number" name="payload[teams][{{ $team->id }}][trisa]" value="{{ old('payload.teams.'.$team->id.'.trisa', 0) }}"></label>
+                        <label>{{ __('ui.card_points') }} <input type="number" name="payload[teams][{{ $team->id }}][card_points]" value="{{ old('payload.teams.'.$team->id.'.card_points', 0) }}"></label>
+                        <label>{{ __('ui.jokers') }} <input type="number" name="payload[teams][{{ $team->id }}][jokers]" value="{{ old('payload.teams.'.$team->id.'.jokers', 0) }}"></label>
+                        <label>{{ __('ui.penalties') }} <input type="number" name="payload[teams][{{ $team->id }}][penalties]" value="{{ old('payload.teams.'.$team->id.'.penalties', 0) }}"></label>
+                    </div>
+                @endforeach
+            </div>
+            @endif
+
+            <button>{{ __('ui.save_scored_round') }}</button>
         </form>
     @else
-        <div class="notice">This match is finished and no more rounds can be scored.</div>
+        <div class="notice">{{ __('ui.match_finished_notice') }}</div>
     @endif
 
     <div class="card">
-        <h2>Round history</h2>
+        <h2>{{ __('ui.round_history') }}</h2>
         <table class="table">
-            <thead><tr><th>Round</th><th>Contract</th><th>Bid</th><th>Results</th></tr></thead>
+            <thead>
+                <tr>
+                    <th>{{ __('ui.round') }}</th>
+                    @if ($match->game_type->value === 'trex')
+                    <th>{{ __('ui.contract') }}</th>
+                    @endif
+                    @if ($match->game_type->value === 'tarneeb_61')
+                    <th>{{ __('ui.bid') }}</th>
+                    @endif
+                    @if ($match->game_type->value === 'tarneeb_41')
+                    <th>1</th> <th>3</th> <th>2</th> <th>4</th>
+                    @else
+                    <th>{{ __('ui.results') }} ( 1</th>
+                    <th>2 )</th>
+                    @endif
+                </tr>
+            </thead>
             <tbody>
                 @forelse ($match->rounds as $round)
                     <tr>
                         <td>#{{ $round->number }}</td>
+                        @if ($match->game_type->value === 'trex')
                         <td>{{ $round->contract ?: '—' }}</td>
+                        @endif
+                        @if ($match->game_type->value === 'tarneeb_61')
                         <td>{{ $round->bidTeam?->name ?? '—' }} {{ $round->bid_amount ? '(' . $round->bid_amount . ')' : '' }}</td>
+                        @endif
+                        @foreach ($round->results as $result)
                         <td>
-                            @foreach ($round->results as $result)
-                                <div>{{ $result->team->name }}: {{ $result->score_delta }} <span class="muted">raw {{ $result->raw_score }}</span></div>
-                            @endforeach
+                            <div>
+                                <!-- {{ $result->player?->name ?? $result->team->name }}: -->
+                                {{ $result->score_delta }}
+                                <span class="muted">
+                                    @if ($match->game_type->value === 'kanasah')
+                                    {{ '*' }} 
+                                    @elseif ($match->game_type->value === 'tarneeb_41')
+                                    {{ '/' }}
+                                    {{ $result->details['bid'] }}
+                                    @endif
+                                </span>
+                            </div>
                         </td>
+                        @endforeach
                     </tr>
                 @empty
-                    <tr><td colspan="4" class="muted">No rounds scored yet.</td></tr>
+                    <tr><td colspan="4" class="muted">{{ __('ui.no_rounds') }}</td></tr>
                 @endforelse
             </tbody>
         </table>

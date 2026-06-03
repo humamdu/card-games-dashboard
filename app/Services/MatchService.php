@@ -6,6 +6,8 @@ use App\Models\MatchGame;
 use App\Models\Round;
 use Illuminate\Support\Facades\DB;
 
+use InvalidArgumentException;
+
 class MatchService
 {
     public function __construct(
@@ -16,6 +18,14 @@ class MatchService
 
     public function create(array $data): MatchGame
     {
+        if ($data['game_type'] == 'trex' && count($data['teams']) !== 2) {
+            throw new InvalidArgumentException('Trex requires exactly 2 single-player teams.');
+        }
+
+        if ($data['game_type'] == 'tarneeb_41' && count($data['teams']) !== 4) {
+            throw new InvalidArgumentException('Tarneeb 41 requires exactly 4 teams single player.');
+        }
+
         return DB::transaction(function () use ($data) {
             $match = MatchGame::create([
                 'game_type' => $data['game_type'],

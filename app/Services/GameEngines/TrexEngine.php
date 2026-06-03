@@ -4,7 +4,6 @@ namespace App\Services\GameEngines;
 
 use App\Models\MatchGame;
 use App\Models\Round;
-use InvalidArgumentException;
 
 class TrexEngine extends AbstractGameEngine
 {
@@ -21,10 +20,6 @@ class TrexEngine extends AbstractGameEngine
 
     public function calculateRoundResults(MatchGame $match, Round $round, array $input): array
     {
-        if ($match->teams()->count() !== 4) {
-            throw new InvalidArgumentException('Trex requires exactly 4 single-player teams.');
-        }
-
         $contract = $round->contract ?? $input['contract'] ?? null;
         $scores = $input['scores'] ?? [];
 

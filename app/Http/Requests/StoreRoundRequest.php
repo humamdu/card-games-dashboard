@@ -13,7 +13,7 @@ class StoreRoundRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'number' => ['nullable', 'integer', 'min:1'],
             'kingdom' => ['nullable', 'string', 'max:255'],
             'contract' => ['nullable', 'string', 'max:255'],
@@ -21,5 +21,16 @@ class StoreRoundRequest extends FormRequest
             'bid_amount' => ['nullable', 'integer'],
             'payload' => ['required', 'array'],
         ];
+
+        $match = $this->route('match');
+
+        if ($match?->game_type?->value === 'tarneeb_41') {
+            $rules['payload.bids'] = ['required', 'array'];
+            $rules['payload.tricks'] = ['required', 'array'];
+            $rules['payload.bids.*'] = ['required', 'integer'];
+            $rules['payload.tricks.*'] = ['required', 'integer'];
+        }
+
+        return $rules;
     }
 }

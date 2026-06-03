@@ -8,6 +8,7 @@ use App\Http\Requests\StoreMatchRequest;
 use App\Models\MatchGame;
 use App\Models\Player;
 use App\Services\MatchService;
+use InvalidArgumentException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -32,9 +33,15 @@ class MatchController extends Controller
 
     public function store(StoreMatchRequest $request): RedirectResponse
     {
-        $match = $this->matchService->create($request->validated());
+        try {
+            $match = $this->matchService->create($request->validated());
 
-        return redirect()->route('matches.show', $match)->with('status', 'Match created successfully.');
+            return redirect()->route('matches.show', $match)->with('status', 'Match created successfully.');
+        } catch (InvalidArgumentException $e) {
+            return back()->withInput()->with('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            return back()->withInput()->with('error', __('ui.unexpected_error'));
+        }
     }
 
     public function show(MatchGame $match): View

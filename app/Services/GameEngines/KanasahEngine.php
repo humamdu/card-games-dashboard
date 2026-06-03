@@ -10,17 +10,23 @@ class KanasahEngine extends AbstractGameEngine
     public function calculateRoundResults(MatchGame $match, Round $round, array $input): array
     {
         return collect($input['teams'] ?? [])->map(function (array $data, $teamId) {
+            $is_positive = -1;
             $cardPoints = (int) ($data['card_points'] ?? 0);
-            $kanasta = (int) ($data['kanasta'] ?? 0) * 500;
-            $dirtyKanasta = (int) ($data['dirty_kanasta'] ?? 0) * 300;
-            $trisa = (int) ($data['trisa'] ?? 0) * 100;
-            $jokers = (int) ($data['jokers'] ?? 0);
+            $jokerKanasta = (int) ($data['joker_kanasta'] ?? 0) * 500;
+            $cleanKanasta = (int) ($data['kanasta'] ?? 0) * 300;
+            $dirtyKanasta = (int) ($data['dirty_kanasta'] ?? 0) * 200;
+            $trisa = (int) ($data['trisa'] ?? 0) * 200;
+            $jokers = (int) ($data['jokers'] ?? 0) * 200;
             $jokerPoints = min($jokers * 50, $jokers >= 2 ? 100 : 50);
             $penalties = (int) ($data['penalties'] ?? 0);
-            $delta = $cardPoints + $kanasta + $dirtyKanasta + $trisa + $jokerPoints - $penalties;
-
+            
+            if ($cleanKanasta || $dirtyKanasta || $jokerKanasta) {
+                $is_positive = 1;
+            } 
+            $delta = $is_positive * ($cardPoints + $jokerKanasta + $cleanKanasta + $dirtyKanasta + $trisa + $jokerPoints - $penalties);
             return $this->result((int) $teamId, $delta, $cardPoints, [
-                'kanasta_bonus' => $kanasta,
+                'joker_kanasta_bonus' => $jokerKanasta,
+                'clean_kanasta_bonus' => $cleanKanasta,
                 'dirty_kanasta_bonus' => $dirtyKanasta,
                 'trisa_bonus' => $trisa,
                 'joker_points_capped' => $jokerPoints,
