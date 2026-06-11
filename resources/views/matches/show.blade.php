@@ -17,7 +17,7 @@
         <div class="grid">
             @foreach ($match->teams as $team)
                 <div class="card">
-                    <div class="grid" style="grid-auto-flow: column;align-items: baseline;">
+                    <div class="grid" style="grid-auto-flow: auto;align-items: baseline;">
                         <h2>{{ $team->name }}</h2>
                         <strong>{{ $team->score }} Pts</strong>
                     </div>
@@ -31,81 +31,182 @@
     @if ($match->status !== 'finished')
         <form class="card stack" method="POST" action="{{ route('matches.rounds.store', $match) }}">
             @csrf
-            <h2>{{ __('ui.score_next_round') }}</h2>
             <div class="grid">
+                <h2>{{ __('ui.score_next_round') }}</h2>
                 <label style="display: none;">{{ __('ui.round') }} <input type="number" name="number" value="{{ old('number', $match->rounds->count() + 1) }}" min="1"></label>
                 @if ($match->game_type->value === 'trex')
-                <label>{{ __('ui.kingdom') }} <input name="kingdom" value="{{ old('kingdom') }}" placeholder="{{ __('ui.kingdom') }}"></label>
-                <label>{{ __('ui.contract_label') }}
-                    <select name="contract">
-                        <option value="">{{ __('ui.manual_not_applicable') }}</option>
-                        <option value="king_of_hearts">Trex: King of Hearts</option>
-                        <option value="queens">Trex: Queens</option>
-                        <option value="diamonds">Trex: Diamonds</option>
-                        <option value="collections">Trex: Collections</option>
-                        <option value="trex">Trex: Trex</option>
-                    </select>
-                </label>
+                    <label>{{ __('ui.kingdom') }} <input name="kingdom" value="{{ old('kingdom') }}" placeholder="{{ __('ui.kingdom') }}"></label>
+                    <label>{{ __('ui.contract_label') }}
+                        <select name="contract">
+                            <option value="">{{ __('ui.manual_not_applicable') }}</option>
+                            <option value="king_of_hearts">Trex: King of Hearts</option>
+                            <option value="queens">Trex: Queens</option>
+                            <option value="diamonds">Trex: Diamonds</option>
+                            <option value="collections">Trex: Collections</option>
+                            <option value="trex">Trex: Trex</option>
+                        </select>
+                    </label>
                 @endif
                 @if ($match->game_type->value === 'tarneeb_61')
-                <label>{{ __('ui.bid_team') }}
-                    <select name="bid_team_id">
-                        <option value="">{{ __('ui.no_bid') }}</option>
-                        @foreach ($match->teams as $team)
-                            <option value="{{ $team->id }}">{{ $team->name }}</option>
-                        @endforeach
-                    </select>
-                </label>
-                <label>{{ __('ui.bid_amount') }} <input type="number" name="bid_amount" value="{{ old('bid_amount') }}"></label>
+                    <label>{{ __('ui.bid_team') }}
+                        <select name="bid_team_id">
+                            <option value="">{{ __('ui.no_bid') }}</option>
+                            @foreach ($match->teams as $team)
+                                <option value="{{ $team->id }}">{{ $team->name }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                    <label>{{ __('ui.bid_amount') }}
+                        <div class="stepper">
+                            <div class="stepper-row">
+                                <button type="button" class="stepper-button" data-step="-1" aria-label="Decrease">−</button>
+                                <input type="number" name="bid_amount" value="{{ old('bid_amount') }}">
+                                <button type="button" class="stepper-button" data-step="1" aria-label="Increase">+</button>
+                            </div>
+                        </div>
+                    </label>
                 @endif
             </div>
 
-            @if ($match->game_type->value === 'konkan' || $match->game_type->value === 'trex') 
-            <h3>{{ __('ui.score_input') }}</h3>
-            <div class="grid">
-                @foreach ($match->teams as $team)
-                    <label>{{ $team->name }} {{ __('ui.score_count') }}
-                        <input type="number" name="payload[scores][{{ $team->id }}]" value="{{ old('payload.scores.'.$team->id, 0) }}">
-                    </label>
-                @endforeach
-            </div>
+            @if ($match->game_type->value === 'trex') 
+                <!-- <h3>{{ __('ui.score_input') }}</h3> -->
+                <div class="grid">
+                    @foreach ($match->teams as $team)
+                        <label>{{ $team->name }} {{ __('ui.score_count') }}
+                            <div class="stepper">
+                                <div class="stepper-row">
+                                    <button type="button" class="stepper-button" data-step="-1" aria-label="Decrease">−</button>
+                                    <input type="number" name="payload[scores][{{ $team->id }}]" value="{{ old('payload.scores.'.$team->id, 0) }}">
+                                    <button type="button" class="stepper-button" data-step="1" aria-label="Increase">+</button>
+                                </div>
+                            </div>
+                        </label>
+                    @endforeach
+                </div>
+            @endif
+
+            @if ($match->game_type->value === 'konkan') 
+                <!-- <h3>{{ __('ui.score_input') }}</h3> -->
+                <div class="grid">
+                    @foreach ($match->teams as $team)
+                        <label>{{ $team->name }} {{ __('ui.score_count') }}
+                            <div class="stepper">
+                                <div class="stepper-row">
+                                    <button type="button" class="stepper-button" data-step="25" aria-label="Decrease">25</button>
+                                    <input type="number" name="payload[scores][{{ $team->id }}]" value="{{ old('payload.scores.'.$team->id, 0) }}">
+                                    <button type="button" class="stepper-button" data-step="10" aria-label="Increase">10</button>
+                                    <button type="button" class="stepper-button" data-step="100" aria-label="Increase">100</button>
+                                </div>
+                            </div>
+                        </label>
+                    @endforeach
+                </div>
             @endif
 
             @if ($match->game_type->value === 'tarneeb_41')
-            <h3>{{ __('ui.player_bids') }}</h3>
-            <div class="grid">
-                @foreach ($match->teams as $team)
-                    <div class="team-form stack">
-                        <strong>{{ $team->name }}</strong>
-                        @foreach ($team->players as $player)
-                            <label>{{ $player->name }} {{ __('ui.bid') }}
-                                <input type="number" name="payload[bids][{{ $player->id }}]" value="{{ old('payload.bids.'.$player->id, 0) }}" required>
-                            </label>
-                            <label>{{ $player->name }} {{ __('ui.tricks') }}
-                                <input type="number" name="payload[tricks][{{ $player->id }}]" value="{{ old('payload.tricks.'.$player->id, 0) }}" required>
-                            </label>
-                        @endforeach
-                    </div>
-                @endforeach
-            </div>
+                <h3>{{ __('ui.player_bids') }}</h3>
+                <div class="grid">
+                    @foreach ($match->teams as $team)
+                        <div class="team-form stack">
+                            <strong>{{ $team->name }}</strong>
+                            @foreach ($team->players as $player)
+                                <label>{{ $player->name }} {{ __('ui.bid') }}
+                                    <div class="stepper">
+                                        <div class="stepper-row">
+                                            <button type="button" class="stepper-button" data-step="-1" aria-label="Decrease">−</button>
+                                            <input type="number" name="payload[bids][{{ $player->id }}]" value="{{ old('payload.bids.'.$player->id, 0) }}" required>
+                                            <button type="button" class="stepper-button" data-step="1" aria-label="Increase">+</button>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label>{{ $player->name }} {{ __('ui.tricks') }}
+                                    <div class="stepper">
+                                        <div class="stepper-row">
+                                            <button type="button" class="stepper-button" data-step="-1" aria-label="Decrease">−</button>
+                                            <input type="number" name="payload[tricks][{{ $player->id }}]" value="{{ old('payload.tricks.'.$player->id, 0) }}" required>
+                                            <button type="button" class="stepper-button" data-step="1" aria-label="Increase">+</button>
+                                        </div>
+                                    </div>
+                                </label>
+                            @endforeach
+                        </div>
+                    @endforeach
+                </div>
             @endif
 
             @if ($match->game_type->value === 'kanasah')
-            <h3>{{ __('ui.score_input') }}</h3>
-            <div class="grid">
-                @foreach ($match->teams as $team)
-                    <div class="team-form stack">
-                        <strong>{{ $team->name }}</strong>
-                        <label>{{ __('ui.joker_kanasta') }} <input type="number" name="payload[teams][{{ $team->id }}][joker_kanasta]" value="{{ old('payload.teams.'.$team->id.'.joker_kanasta', 0) }}"></label>
-                        <label>{{ __('ui.clean_kanasta') }} <input type="number" name="payload[teams][{{ $team->id }}][kanasta]" value="{{ old('payload.teams.'.$team->id.'.kanasta', 0) }}"></label>
-                        <label>{{ __('ui.dirty_kanasta') }} <input type="number" name="payload[teams][{{ $team->id }}][dirty_kanasta]" value="{{ old('payload.teams.'.$team->id.'.dirty_kanasta', 0) }}"></label>
-                        <label>{{ __('ui.trisa') }} <input type="number" name="payload[teams][{{ $team->id }}][trisa]" value="{{ old('payload.teams.'.$team->id.'.trisa', 0) }}"></label>
-                        <label>{{ __('ui.card_points') }} <input type="number" name="payload[teams][{{ $team->id }}][card_points]" value="{{ old('payload.teams.'.$team->id.'.card_points', 0) }}"></label>
-                        <label>{{ __('ui.jokers') }} <input type="number" name="payload[teams][{{ $team->id }}][jokers]" value="{{ old('payload.teams.'.$team->id.'.jokers', 0) }}"></label>
-                        <label>{{ __('ui.penalties') }} <input type="number" name="payload[teams][{{ $team->id }}][penalties]" value="{{ old('payload.teams.'.$team->id.'.penalties', 0) }}"></label>
-                    </div>
-                @endforeach
-            </div>
+                <!-- <h3>{{ __('ui.score_input') }}</h3> -->
+                <div class="grid">
+                    @foreach ($match->teams as $team)
+                        <div class="team-form stack">
+                            <strong>{{ $team->name }}</strong>
+                            <label>{{ __('ui.joker_kanasta') }}
+                                <div class="stepper">
+                                    <div class="stepper-row">
+                                        <button type="button" class="stepper-button" data-step="-1" aria-label="Decrease">−</button>
+                                        <input type="number" name="payload[teams][{{ $team->id }}][joker_kanasta]" value="{{ old('payload.teams.'.$team->id.'.joker_kanasta', 0) }}">
+                                        <button type="button" class="stepper-button" data-step="1" aria-label="Increase">+</button>
+                                    </div>
+                                </div>
+                            </label>
+                            <label>{{ __('ui.clean_kanasta') }}
+                                <div class="stepper">
+                                    <div class="stepper-row">
+                                        <button type="button" class="stepper-button" data-step="-1" aria-label="Decrease">−</button>
+                                        <input type="number" name="payload[teams][{{ $team->id }}][kanasta]" value="{{ old('payload.teams.'.$team->id.'.kanasta', 0) }}">
+                                        <button type="button" class="stepper-button" data-step="1" aria-label="Increase">+</button>
+                                    </div>
+                                </div>
+                            </label>
+                            <label>{{ __('ui.dirty_kanasta') }}
+                                <div class="stepper">
+                                    <div class="stepper-row">
+                                        <button type="button" class="stepper-button" data-step="-1" aria-label="Decrease">−</button>
+                                        <input type="number" name="payload[teams][{{ $team->id }}][dirty_kanasta]" value="{{ old('payload.teams.'.$team->id.'.dirty_kanasta', 0) }}">
+                                        <button type="button" class="stepper-button" data-step="1" aria-label="Increase">+</button>
+                                    </div>
+                                </div>
+                            </label>
+                            <label>{{ __('ui.trisa') }}
+                                <div class="stepper">
+                                    <div class="stepper-row">
+                                        <button type="button" class="stepper-button" data-step="-1" aria-label="Decrease">−</button>
+                                        <input type="number" name="payload[teams][{{ $team->id }}][trisa]" value="{{ old('payload.teams.'.$team->id.'.trisa', 0) }}">
+                                        <button type="button" class="stepper-button" data-step="1" aria-label="Increase">+</button>
+                                    </div>
+                                </div>
+                            </label>
+                            <label>{{ __('ui.card_points') }}
+                                <div class="stepper">
+                                    <div class="stepper-row">
+                                        <button type="button" class="stepper-button" data-step="-1" aria-label="Decrease">−</button>
+                                        <input type="number" name="payload[teams][{{ $team->id }}][card_points]" value="{{ old('payload.teams.'.$team->id.'.card_points', 0) }}">
+                                        <button type="button" class="stepper-button" data-step="1" aria-label="Increase">+</button>
+                                        <button type="button" class="stepper-button" data-step="10" aria-label="Increase">++</button>
+                                    </div>
+                                </div>
+                            </label>
+                            <label>{{ __('ui.jokers') }}
+                                <div class="stepper">
+                                    <div class="stepper-row">
+                                        <button type="button" class="stepper-button" data-step="-1" aria-label="Decrease">−</button>
+                                        <input type="number" name="payload[teams][{{ $team->id }}][jokers]" value="{{ old('payload.teams.'.$team->id.'.jokers', 0) }}">
+                                        <button type="button" class="stepper-button" data-step="1" aria-label="Increase">+</button>
+                                    </div>
+                                </div>
+                            </label>
+                            <label>{{ __('ui.penalties') }}
+                                <div class="stepper">
+                                    <div class="stepper-row">
+                                        <button type="button" class="stepper-button" data-step="-1" aria-label="Decrease">−</button>
+                                        <input type="number" name="payload[teams][{{ $team->id }}][penalties]" value="{{ old('payload.teams.'.$team->id.'.penalties', 0) }}">
+                                        <button type="button" class="stepper-button" data-step="1" aria-label="Increase">+</button>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    @endforeach
+                </div>
             @endif
 
             <button>{{ __('ui.save_scored_round') }}</button>
@@ -169,3 +270,34 @@
     </div>
 </section>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('click', function (event) {
+        var button = event.target.closest('.stepper-button');
+        if (!button) return;
+
+        var row = button.closest('.stepper-row');
+        if (!row) return;
+
+        var input = row.querySelector('input[type="number"]');
+        if (!input) return;
+
+        var step = parseFloat(button.getAttribute('data-step')) || 1;
+        var current = parseFloat(input.value);
+        if (Number.isNaN(current)) current = 0;
+
+        var next = current + step;
+        if (input.hasAttribute('min')) {
+            var min = parseFloat(input.min);
+            if (!Number.isNaN(min) && next < min) next = min;
+        }
+        if (input.hasAttribute('max')) {
+            var max = parseFloat(input.max);
+            if (!Number.isNaN(max) && next > max) next = max;
+        }
+
+        input.value = Number.isInteger(current) && Number.isInteger(step) ? parseInt(next, 10) : next;
+    });
+</script>
+@endpush

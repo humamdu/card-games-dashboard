@@ -24,7 +24,7 @@
                 <input type="hidden" name="teams[{{ $index }}][position]" value="{{ $index + 1 }}">
                 <label>{{ __('ui.team_name') }} <input name="teams[{{ $index }}][name]" value="{{ $team['name'] ?? __('ui.team').' '.($index + 1) }}" required></label>
                 <label>{{ __('ui.players_label') }}
-                    <input style="margin-left: -200%;" type="checkbox" name="teams[{{ $index }}][active]" id="teams-{{ $index }}-active" @checked($team['active'] ?? false)>
+                    <input style="margin-left: -35%;" type="checkbox" name="teams[{{ $index }}][active]" id="teams-{{ $index }}-active" @checked($team['active'] ?? false)>
                     <select name="teams[{{ $index }}][player_ids][]" multiple required>
                         @foreach ($players as $player)
                             <option value="{{ $player->id }}" @selected(in_array($player->id, $team['player_ids'] ?? []))>{{ $player->name }}</option>

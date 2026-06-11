@@ -23,6 +23,11 @@
         input, select { background: #020617; color: #e2e8f0; border: 1px solid #334155; width: 100%; min-height: 44px; }
         select[multiple] { min-height: 8rem; }
         label { display: grid; gap: .4rem; color: #cbd5e1; font-weight: 700; }
+        .stepper { display: grid; gap: .4rem; }
+        .stepper-row { display: inline-flex; align-items: center; gap: .5rem; width: 100%; }
+        .stepper-row input[type="number"] { text-align: center; min-width: 4rem; width: 100%; }
+        .stepper-button { appearance: none; border: 1px solid #475569; background: #334155; color: #e2e8f0; border-radius: .75rem; min-width: 2.5rem; min-height: 2.5rem; padding: .45rem .6rem; font-size: 1rem; cursor: pointer; }
+        .stepper-button:hover { background: #1e293b; }
         .layout { max-width: 1180px; margin: 0 auto; padding: 1rem; }
         .nav { display: flex; gap: 1rem; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; justify-content: space-between; }
         .nav > strong { font-size: 1.1rem; }

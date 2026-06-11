@@ -11,13 +11,13 @@ class KanasahEngine extends AbstractGameEngine
     {
         return collect($input['teams'] ?? [])->map(function (array $data, $teamId) {
             $is_positive = -1;
-            $cardPoints = (int) ($data['card_points'] ?? 0);
+            $cardPoints = (int) ($data['card_points'] ?? 0)*10;
             $jokerKanasta = (int) ($data['joker_kanasta'] ?? 0) * 500;
             $cleanKanasta = (int) ($data['kanasta'] ?? 0) * 300;
             $dirtyKanasta = (int) ($data['dirty_kanasta'] ?? 0) * 200;
             $trisa = (int) ($data['trisa'] ?? 0) * 200;
-            $jokers = (int) ($data['jokers'] ?? 0) * 200;
-            $jokerPoints = min($jokers * 50, $jokers >= 2 ? 100 : 50);
+            $jokers = (int) ($data['jokers'] ?? 0);
+            $jokerPoints = $jokers * 200;
             $penalties = (int) ($data['penalties'] ?? 0);
             
             if ($cleanKanasta || $dirtyKanasta || $jokerKanasta) {
